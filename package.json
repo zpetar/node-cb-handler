@@ -1,0 +1,23 @@
+{
+  "name": "cb-handler",
+  "version": "1.0.0",
+  "description": "Lightweight simple module for handling node style callbacks",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test",
+    "test:dev": "gulp test:dev"
+  },
+  "keywords": [
+    "error",
+    "handler",
+    "callback"
+  ],
+  "author": "Petar Zjajic",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-jasmine": "^2.2.1",
+    "jasmine-spec-reporter": "^2.4.0"
+  }
+}
