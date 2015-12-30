@@ -1,7 +1,7 @@
 /**
  * Created by petarz on 12/30/2015.
  */
-var defaultHandler = function(err) {
+var defaultErrorHandler = function(err) {
   throw new Error(err);
 };
 
@@ -9,7 +9,7 @@ function argShouldBeFunction() {
   throw new TypeError('function argument needs to be a function');
 }
 
-function ErrorHandler() {
+function CallbackHandler() {
   var errorHandler, publicAPI = {};
 
   function processCallback(callback) {
@@ -19,7 +19,7 @@ function ErrorHandler() {
     return function(err) {
       var data;
       if (err) {
-        errorHandler ? errorHandler(err) : defaultHandler(err);
+        errorHandler ? errorHandler(err) : defaultErrorHandler(err);
         return;
       }
       data = extractDataArguments(arguments);
@@ -61,16 +61,16 @@ function ErrorHandler() {
 
 function setDefault(handler) {
   if (typeof handler === 'function') {
-    defaultHandler = handler;
+    defaultErrorHandler = handler;
   } else {
     argShouldBeFunction();
   }
 }
 
-Object.defineProperty(ErrorHandler, 'defaultHandler', {
-  get: function() {return defaultHandler;},
+Object.defineProperty(CallbackHandler, 'defaultErrorHandler', {
+  get: function() {return defaultErrorHandler;},
   set: setDefault
 });
 
-module.exports = ErrorHandler;
+module.exports = CallbackHandler;
 

@@ -4,9 +4,10 @@
 var CbHandler = require('./index.js'),
   cbHandler = new CbHandler();
 
-CbHandler.defaultHandler = function(err) {
+CbHandler.defaultErrorHandler = function(err) {
   console.log('Default handler: %s', err);
 };
+
 
 cbHandler.errorHandler = function(err) {
   console.log('this is my predefined handler: %s', err);

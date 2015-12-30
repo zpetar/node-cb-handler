@@ -12,8 +12,8 @@ describe('Module: cb-handler', function() {
     expect(typeof Handler).toBe('function');
   });
 
-  it('should has a property named \'defaultHandler\'', function() {
-    expect(Handler.defaultHandler).toBeDefined();
+  it('should has a property named \'defaultErrorHandler\'', function() {
+    expect(Handler.defaultErrorHandler).toBeDefined();
   });
 
   describe('when module is executed', function() {
@@ -77,7 +77,7 @@ describe('Module: cb-handler', function() {
 
         describe('when just default handler is provided', function() {
           beforeEach(function() {
-            Handler.defaultHandler = errorHandler;
+            Handler.defaultErrorHandler = errorHandler;
             wrappedCb(mockedError);
           });
           it('should use it to handle the error', function() {
