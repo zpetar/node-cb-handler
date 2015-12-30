@@ -67,8 +67,12 @@ function setDefault(handler) {
   }
 }
 
+function getDefault() {
+  return defaultErrorHandler;
+}
+
 Object.defineProperty(CallbackHandler, 'defaultErrorHandler', {
-  get: function() {return defaultErrorHandler;},
+  get: getDefault,
   set: setDefault
 });
 
