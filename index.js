@@ -9,6 +9,18 @@ function argShouldBeFunction() {
   throw new TypeError('function argument needs to be a function');
 }
 
+function extractDataArguments(args) {
+  var dataArguments = [], i;
+  if (args) {
+    for (i = 0; i < args.length; i++) {
+      if (i !== 0) {
+        dataArguments.push(args[i]);
+      }
+    }
+  }
+  return dataArguments;
+}
+
 function CallbackHandler() {
   var errorHandler, publicAPI = {};
 
@@ -25,18 +37,6 @@ function CallbackHandler() {
       data = extractDataArguments(arguments);
       callback.apply(null, data);
     };
-  }
-
-  function extractDataArguments(args) {
-    var dataArguments = [], i;
-    if (args) {
-      for (i = 0; i < args.length; i++) {
-        if (i !== 0) {
-          dataArguments.push(args[i]);
-        }
-      }
-    }
-    return dataArguments;
   }
 
   function setErrorHandler(handler) {
