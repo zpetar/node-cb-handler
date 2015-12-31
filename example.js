@@ -19,14 +19,13 @@ cbHandler.on('error', function(err) {
   console.log('this is predefined handler: %s', err);
 });
 
-
 function getFileContent(filePath, cb) {
   var cbHandler = new CbHandler(),
     handle = cbHandler.handle;
-  cbHandler.on('error', cb);
-  cbHandler.on('error', function(err) {
-    console.log('SECOND ONE');
-  });
+   cbHandler.on('error', cb);
+   cbHandler.once('error', function(err) {
+   console.log('additional one time handler: %s', err);
+   });
 
   fs.stat(filePath, handle(function(stat) {
     if (!stat.isDirectory()) {
@@ -36,7 +35,6 @@ function getFileContent(filePath, cb) {
     }
   }));
 }
-
 
 getFileContent('abrakadabra', handle(function(content) {
   console.log(content);

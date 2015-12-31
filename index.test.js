@@ -2,7 +2,8 @@
  * Created by petarz on 12/30/2015.
  */
 describe('Module: cb-handler', function() {
-  var Handler = require('./index.js');
+  var Handler = require('./index.js'),
+    Emitter = require('events');
 
   it('should exists', function() {
     expect(Handler).toBeDefined();
@@ -24,31 +25,9 @@ describe('Module: cb-handler', function() {
 
     it('should return the object with the right API', function() {
       expect(typeof handler.handle).toBe('function');
-      expect(typeof handler.errorHandler).toBeDefined();
+      expect(handler instanceof Emitter).toBe(true);
     });
 
-    describe('when errorHandler property is set', function() {
-      var errorHandler = function(err) {};
-      beforeEach(function() {
-        handler.errorHandler = errorHandler;
-      });
-
-      it('should use that error handler while handling errors', function() {
-        expect(handler.errorHandler).toEqual(errorHandler);
-      });
-    });
-
-    describe('when errorHandler property is set as a non function object', function() {
-      var error;
-      it('should throw an error', function() {
-        try {
-          handler.errorHandler = {};
-        } catch(err) {
-          error = err;
-        }
-        expect(error).toBeDefined();
-      });
-    });
 
     describe('when \'handle\' function is called', function() {
       var wrappedCb,
@@ -97,41 +76,14 @@ describe('Module: cb-handler', function() {
           })
         });
 
-        describe('when error handler is defined on handler instance', function() {
+        describe('when error handler is provided on handler instance', function() {
           beforeEach(function() {
-            handler.errorHandler = errorHandler;
+            handler.on('error', errorHandler);
             wrappedCb(mockedError);
           });
 
           it('should use it to handle the error', function() {
             expect(errorHandler).toHaveBeenCalledWith(mockedError);
-          });
-        });
-
-        describe('when second argument to handle function is passed', function() {
-          describe('when that argument is a function', function() {
-            var additionalErrorHandler = jasmine.createSpy('additionalErrorHandler'),
-              wrappedCb;
-            beforeEach(function() {
-              wrappedCb = handler.handle(dataCb, additionalErrorHandler);
-            });
-
-            it('should call that handler', function() {
-              wrappedCb(mockedError);
-              expect(additionalErrorHandler).toHaveBeenCalledWith(mockedError);
-            });
-          });
-
-          describe('when that argument is a non function', function() {
-            var wrappedCb;
-            beforeEach(function() {
-              handler.handle(dataCb, {});
-            });
-            it('should throw an error', function() {
-              expect(function() {
-                wrappedCb(null);
-              }).toThrow();
-            });
           });
         });
       });

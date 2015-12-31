@@ -29,7 +29,7 @@ function CallbackHandler() {
       publicAPI.emit('error', err) : defaultErrorHandler(err);
   }
 
-  function handleCallback(callback, passErrorFurther) {
+  function handleCallback(callback) {
     if (typeof callback !== 'function') {
       argShouldBeFunction();
       return;
@@ -40,9 +40,6 @@ function CallbackHandler() {
       var data;
       if (err) {
         emitError(err);
-        if (passErrorFurther) {
-          passErrorFurther(err);
-        }
         return;
       }
       data = extractDataArguments(arguments);
