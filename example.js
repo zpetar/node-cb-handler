@@ -15,15 +15,18 @@ CbHandler.defaultErrorHandler = function(err) {
 
 // if error handler on the instance is defined
 // default one will be ignored
-cbHandler.errorHandler = function(err) {
+cbHandler.on('error', function(err) {
   console.log('this is predefined handler: %s', err);
-};
+});
 
 
 function getFileContent(filePath, cb) {
   var cbHandler = new CbHandler(),
     handle = cbHandler.handle;
-  cbHandler.errorHandler = cb;
+  cbHandler.on('error', cb);
+  cbHandler.on('error', function(err) {
+    console.log('SECOND ONE');
+  });
 
   fs.stat(filePath, handle(function(stat) {
     if (!stat.isDirectory()) {
