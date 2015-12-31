@@ -2,8 +2,9 @@
  * Created by petarz on 12/30/2015.
  */
 var defaultErrorHandler = function(err) {
-  throw new Error(err);
-};
+    throw new Error(err);
+  },
+  noop = function() {};
 
 function argShouldBeFunction() {
   throw new TypeError('function argument needs to be a function');
@@ -12,30 +13,35 @@ function argShouldBeFunction() {
 function extractDataArguments(args) {
   var dataArguments = [], i;
   if (args) {
-    for (i = 0; i < args.length; i++) {
-      if (i !== 0) {
-        dataArguments.push(args[i]);
-      }
+    for (i = 1; i < args.length; i++) {
+      dataArguments.push(args[i]);
     }
   }
   return dataArguments;
 }
 
 function CallbackHandler() {
-  var errorHandler, publicAPI = {};
+  var errorHandler,
+    publicAPI = {};
 
-  function processCallback(callback) {
+  function handleCallback(callback, passErrorFurther) {
     if (typeof callback !== 'function') {
-      throw new TypeError('Callback not provided');
+      argShouldBeFunction();
+      return;
     }
+
+    callback = callback || noop;
     return function(err) {
       var data;
       if (err) {
         errorHandler ? errorHandler(err) : defaultErrorHandler(err);
+        if (passErrorFurther) {
+          passErrorFurther(err);
+        }
         return;
       }
       data = extractDataArguments(arguments);
-      callback.apply(null, data);
+      callback.apply(publicAPI, data);
     };
   }
 
@@ -51,11 +57,12 @@ function CallbackHandler() {
     return errorHandler;
   }
 
-  publicAPI.process = processCallback;
+  publicAPI.handle = handleCallback;
   Object.defineProperty(publicAPI, 'errorHandler', {
     get: getErrorHandler,
     set: setErrorHandler
   });
+
   return publicAPI;
 }
 

@@ -2,7 +2,9 @@ var gulp = require('gulp'),
   jasmine = require('gulp-jasmine'),
   JasmineReporter = require('jasmine-spec-reporter'),
   debug = require('gulp-debug'),
-  testsPath = './**/*.test.js';
+  path = require('path'),
+  testsPath = './**/*.test.js',
+  jsFiles = './**/*.js';
 
 function startTests(path) {
   path = path || testsPath;
@@ -17,9 +19,9 @@ gulp.task('test', function() {
   return startTests();
 });
 
-gulp.task('test:dev', function() {
-  var watcher = gulp.watch(testsPath);
-  watcher.on('change', function(event) {
-    startTests(event.path);
+gulp.task('test:dev', ['test'], function() {
+  var watcher = gulp.watch(jsFiles);
+  watcher.on('change', function() {
+    startTests();
   });
 });

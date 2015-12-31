@@ -23,7 +23,7 @@ describe('Module: cb-handler', function() {
     });
 
     it('should return the object with the right API', function() {
-      expect(typeof handler.process).toBe('function');
+      expect(typeof handler.handle).toBe('function');
       expect(typeof handler.errorHandler).toBeDefined();
     });
 
@@ -38,7 +38,7 @@ describe('Module: cb-handler', function() {
       });
     });
 
-    describe('when errorHandler property is set as a nonfunction object', function() {
+    describe('when errorHandler property is set as a non function object', function() {
       var error;
       it('should throw an error', function() {
         try {
@@ -50,14 +50,14 @@ describe('Module: cb-handler', function() {
       });
     });
 
-    describe('when process function is called', function() {
+    describe('when \'handle\' function is called', function() {
       var wrappedCb,
         dataCb = jasmine.createSpy('dataCb'),
         errorHandler = jasmine.createSpy('errorHandler'),
         mockedError = new Error('test-error');
 
       beforeEach(function() {
-        wrappedCb = handler.process(dataCb);
+        wrappedCb = handler.handle(dataCb);
       });
 
       it('should call the data cb if no error happened', function() {
@@ -66,12 +66,23 @@ describe('Module: cb-handler', function() {
         expect(dataCb).toHaveBeenCalledWith(mockedData);
       });
 
+      it('should call the data cb too if multiple data objects has been passed', function() {
+        var mockedData1 = {}, mockedData2 = {};
+        wrappedCb(null, mockedData1, mockedData2);
+        expect(dataCb).toHaveBeenCalledWith(mockedData1, mockedData2);
+      });
+
+      it('should call the data cb if no data available', function() {
+        wrappedCb(null);
+        expect(dataCb).toHaveBeenCalled();
+      });
+
       describe('when error happens', function() {
         describe('when an error handler is not provided nor default one is set', function() {
           it('should throw that error', function() {
             expect(function() {
-              wrappedCb(new Error('test-error'));
-            }).toThrow();
+              wrappedCb(mockedError);
+            }).toThrowError(Error);
           });
         });
 
@@ -80,12 +91,13 @@ describe('Module: cb-handler', function() {
             Handler.defaultErrorHandler = errorHandler;
             wrappedCb(mockedError);
           });
+
           it('should use it to handle the error', function() {
             expect(errorHandler).toHaveBeenCalledWith(mockedError);
           })
         });
 
-        describe('when handler is defined on handler instance', function() {
+        describe('when error handler is defined on handler instance', function() {
           beforeEach(function() {
             handler.errorHandler = errorHandler;
             wrappedCb(mockedError);
@@ -95,6 +107,41 @@ describe('Module: cb-handler', function() {
             expect(errorHandler).toHaveBeenCalledWith(mockedError);
           });
         });
+
+        describe('when second argument to handle function is passed', function() {
+          describe('when that argument is a function', function() {
+            var additionalErrorHandler = jasmine.createSpy('additionalErrorHandler'),
+              wrappedCb;
+            beforeEach(function() {
+              wrappedCb = handler.handle(dataCb, additionalErrorHandler);
+            });
+
+            it('should call that handler', function() {
+              wrappedCb(mockedError);
+              expect(additionalErrorHandler).toHaveBeenCalledWith(mockedError);
+            });
+          });
+
+          describe('when that argument is a non function', function() {
+            var wrappedCb;
+            beforeEach(function() {
+              handler.handle(dataCb, {});
+            });
+            it('should throw an error', function() {
+              expect(function() {
+                wrappedCb(null);
+              }).toThrow();
+            });
+          });
+        });
+      });
+    });
+
+    describe('when \'handle\' function is called with non function object', function() {
+      it('should thrown a type error', function() {
+        expect(function() {
+          handler.handle({});
+        }).toThrowError(TypeError, 'function argument needs to be a function');
       });
     });
   });
